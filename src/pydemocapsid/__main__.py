@@ -3,7 +3,7 @@
 import sys
 
 from .cli import parse_args
-from .democapsid import calc_ckm, calc_ico, calc_lattice, dextrize
+from .pydemocapsid import calc_ckm, calc_ico, calc_lattice, dextrize
 
 args = parse_args(sys.argv[1:])
 
