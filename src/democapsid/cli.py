@@ -3,7 +3,7 @@
 def parse_args(argv):
     from argparse import ArgumentDefaultsHelpFormatter, ArgumentParser
     parser = ArgumentParser(
-        prog="pydemocapsid",
+        prog="democapsid",
         formatter_class=ArgumentDefaultsHelpFormatter,
         description="Calculate meshes for icosahedral virus capsids."
     )
