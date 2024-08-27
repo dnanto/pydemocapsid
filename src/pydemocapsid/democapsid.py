@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import sys
 from functools import partial
 from itertools import chain
 
