@@ -646,7 +646,6 @@ def ico_coors_3(ckv, iter=100, tol=1E-15):
             pass
     obj = lambda t: fold(t)[-1]
     t = next(bisection(obj, a, b, iter=iter, tol=tol)[2] for a, b in brackets(obj, t, np.pi / 4, iter))
-    print("3,1>", t)
     pD, pF, pG, _ = fold(t)
 
     t = (2 * np.pi) / 3
