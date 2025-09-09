@@ -236,36 +236,40 @@ def calc_lattice(t, R6):
         ]
     elif t == "dualhex":
         r6 = R6 * (SQRT3 / 2)
+        dR = 2 * r6
+        dr = dR * (SQRT3 / 2)
         basis = np.array([
-            [(3 / 2) * R6, r6],
-            [0, 2 * r6],
+            [(3 / 2) * dR, dr],
+            [0, 2 * dr],
         ])
-        tri, r3 = calc_triangle(R3 := R6 / SQRT3)
-        tri = [ele + [0, -(r6 - r3)] for ele in tri]
+        tri, r3 = calc_triangle(dR / SQRT3)
+        tri = [ele + [0, -(dr - r3)] for ele in tri]
         tris = [[rmat_2d(i * np.pi / 3) @ ele for ele in tri] for i in range(6)]
         tiler = [
             *((lambda coor, tri=tri: tri + coor) for tri in tris)
         ]
     elif t == "dualtrihex":
         r6 = R6 * (SQRT3 / 2)
+        dR = 3 * r6 - R6 / (2 * SQRT3)
+        dr = dR * (SQRT3 / 2)
         sin, cos = np.sin(np.pi / 6), np.cos(np.pi / 3)
         rmb1 = np.array([
             [0, 0],
-            [0.5 * r6, -(0.25 * R6 * sin) / cos],
-            [r6, 0],
-            [0.5 * r6, (0.25 * R6 * sin) / cos]
+            [0.5 * dr, -(0.25 * dR * sin) / cos],
+            [dr, 0],
+            [0.5 * dr, (0.25 * dR * sin) / cos]
         ])
         rmb2 = [
-            [-0.5 * r6, 0.5 * R6 + (0.25 * R6 * sin) / cos],
-            [0, 0.5 * R6],
-            [r6 - 0.5 * r6, 0.5 * R6 + (0.25 * R6 * sin) / cos],
-            [0, 0.5 * R6 + (2 * (0.25 * R6 * sin)) / cos]
+            [-0.5 * dr, 0.5 * dR + (0.25 * dR * sin) / cos],
+            [0, 0.5 * dR],
+            [dr - 0.5 * dr, 0.5 * dR + (0.25 * dR * sin) / cos],
+            [0, 0.5 * dR + (2 * (0.25 * dR * sin)) / cos]
         ]
         rmbs1 = [[rmat_2d(i * np.pi / 3) @ ele for ele in rmb1] for i in range(6)]
         rmbs2 = [[rmat_2d(i * np.pi / 3) @ ele for ele in rmb2] for i in range(6)]
         basis = np.array([
-            [2 * r6, 0],
-            [r6, SQRT3 * r6],
+            [2 * dr, 0],
+            [dr, SQRT3 * dr],
         ])
         tiler = [
             *((lambda coor, rmb=rmb: rmb + coor) for rmb in rmbs1),
@@ -290,15 +294,17 @@ def calc_lattice(t, R6):
         ]
     elif t == "dualrhombitrihex":
         r6 = R6 * (SQRT3 / 2)
+        dR = R6 + R6 / SQRT3
+        dr = dR * (SQRT3 / 2)
         basis = np.array([
-            [(3 / 2) * R6, r6],
-            [0, 2 * r6],
+            [(3 / 2) * dR, dr],
+            [0, 2 * dr],
         ])
         sgm = np.array([
             [0, 0],
-            [0, r6],
-            [0.5 * R6, r6],
-            [(SQRT3 / 2) * r6, 0.5 * r6]
+            [0, dr],
+            [0.5 * dR, dr],
+            [(SQRT3 / 2) * dr, 0.5 * dr]
         ])
         sgms = [[rmat_2d(i * np.pi / 3) @ ele for ele in sgm] for i in range(6)]
         tiler = [
@@ -534,7 +540,7 @@ def ico_coors_2(ckv, iter=100, tol=1E-15):
     """Calculate icosahedron vertex coordinates with two-fold axial symmetry.
 
     Args:
-        ckv (list): The Casar-Klug vectors.
+        ckv (list): The Caspar-Klug vectors.
         iter (int, optional): The iteration number for numerical methods. Defaults to 100.
         tol (float, optional): The machine epsilon for numerical methods. Defaults to 1E-15.
 
@@ -599,7 +605,7 @@ def ico_coors_3(ckv, iter=100, tol=1E-15):
     """Calculate icosahedron vertex coordinates with three-fold axial symmetry.
 
     Args:
-        ckv (list): The Casar-Klug vectors.
+        ckv (list): The Caspar-Klug vectors.
         iter (int, optional): The iteration number for numerical methods. Defaults to 100.
         tol (float, optional): The machine epsilon for numerical methods. Defaults to 1E-15.
 
@@ -640,6 +646,7 @@ def ico_coors_3(ckv, iter=100, tol=1E-15):
             pass
     obj = lambda t: fold(t)[-1]
     t = next(bisection(obj, a, b, iter=iter, tol=tol)[2] for a, b in brackets(obj, t, np.pi / 4, iter))
+    print("3,1>", t)
     pD, pF, pG, _ = fold(t)
 
     t = (2 * np.pi) / 3
@@ -663,7 +670,7 @@ def ico_coors_5(ckv):
     """Calculate icosahedron vertex coordinates with five-fold axial symmetry.
 
     Args:
-        ckv (list): The Casar-Klug vectors.
+        ckv (list): The Caspar-Klug vectors.
 
     Returns:
         np.array: The array of vertex coordinates.
@@ -839,3 +846,24 @@ def meshes_to_chimerax(meshes):
             triangles = np.vstack([(len(vertices) - 1, src, tar) for src, tar in edges])
             edge_mask = 2 * np.ones(len(triangles)).astype(int)
             yield i, j, vertices, triangles, edge_mask
+
+def main(args):
+    ckp = (args.h, args.k, args.H, args.K)
+    lat = calc_lattice(args.t, args.R)
+
+    if args.m == "coor":
+        ico_coors = (None, None, ico_coors_2, ico_coors_3, None, ico_coors_5)[args.a]
+        print(ico_coors(calc_ckv(ckp, lat[0])))
+    else:
+        if args.m == "ico":
+            meshes = calc_ico(ckp, lat, a=args.a, s=args.s, iter=args.iter, tol=args.tol)
+        elif args.m == "tri":
+            meshes = calc_ckm(ckp, lat)
+
+        meshes = meshes if args.c == "levo" else dextrize(meshes)
+
+        print("x", "y", "z", "face", "polygon", "point", sep="\t")
+        for i, mesh in enumerate(meshes[1:], start=1):
+            for j, polygon in enumerate(mesh, start=1):
+                for k, point in enumerate(polygon[0], start=1):
+                    print(*point, i, j, k, sep="\t")
