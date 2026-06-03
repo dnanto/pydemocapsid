@@ -848,7 +848,7 @@ def meshes_to_chimerax(meshes):
 
 def main(args):
     ckp = (args.h, args.k, args.H, args.K)
-    lat = calc_lattice(args.t, args.R)
+    lat = calc_lattice(args.L, args.R)
 
     if args.m == "coor":
         ico_coors = (None, None, ico_coors_2, ico_coors_3, None, ico_coors_5)[args.a]
@@ -859,7 +859,7 @@ def main(args):
         elif args.m == "tri":
             meshes = calc_ckm(ckp, lat)
 
-        meshes = meshes if args.c == "levo" else dextrize(meshes)
+        meshes = meshes if args.t == "levo" else dextrize(meshes)
 
         print("x", "y", "z", "face", "polygon", "point", sep="\t")
         for i, mesh in enumerate(meshes[1:], start=1):
