@@ -239,8 +239,8 @@ def calc_lattice(t, R6):
         dR = 2 * r6
         dr = dR * (SQRT3 / 2)
         basis = np.array([
-            [(3 / 2) * dR, dr],
-            [0, 2 * dr],
+            [2 * r6, 0], 
+            [r6, r6 * SQRT3]
         ])
         tri, r3 = calc_triangle(dR / SQRT3)
         tri = [ele + [0, -(dr - r3)] for ele in tri]
